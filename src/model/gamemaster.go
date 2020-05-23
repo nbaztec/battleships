@@ -5,6 +5,10 @@ import (
 	"time"
 )
 
+const (
+	DefaultGCDuration = 30 * time.Minute
+)
+
 type GameMaster struct {
 	ActiveGames map[string]*Game
 }
@@ -12,7 +16,7 @@ type GameMaster struct {
 func (g *GameMaster) GC() {
 	var marked []string
 	for _, v := range g.ActiveGames {
-		if time.Now().Sub(v.LastActivity) > 30*time.Minute {
+		if time.Now().Sub(v.LastActivity) > DefaultGCDuration {
 			marked = append(marked, v.ID)
 		}
 	}
