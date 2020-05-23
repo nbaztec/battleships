@@ -1,5 +1,4 @@
 Audio.prototype.stopAndPlay = function() {
-    console.log(this.src, 'begin')
     this.pause()
     this.currentTime = 0;
     return this.play().then(() => console.log(this.src, 'end'));

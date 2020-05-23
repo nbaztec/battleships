@@ -249,7 +249,6 @@ class API {
             return;
         }
 
-        console.log(this._lastOpponentTurn.id, this._opponent.lastAction.id)
         if (this._lastOpponentTurn.id === this._opponent.lastAction.id) {
             return;
         }
@@ -260,7 +259,6 @@ class API {
 
 
         if (!this._opponent.lastAction.hitShipId.length) {
-            console.log('OPPONENT MISS')
             audioMiss.stopAndPlay();
         } else {
             if (this._opponent.lastAction.sunk) {
@@ -364,7 +362,6 @@ class API {
                     this._state = res.data;
                     const action = this._player.lastAction;
                     if (!action.hitShipId.length) {
-                        console.log('PLAYER MISS')
                         audioMiss.stopAndPlay();
                     } else {
                         if (action.sunk) {
@@ -389,7 +386,6 @@ class API {
     }
 
     gameFinished() {
-        console.log(this._finished)
         if (this._finished) {
             return true;
         }
@@ -425,6 +421,7 @@ class API {
     }
 
     waitForRematch() {
+        $waitingOpponent.show();
         const refresh = () => {
             setTimeout(() => {
                 this.gameStatus()
@@ -434,6 +431,7 @@ class API {
                             return;
                         }
 
+                        $waitingOpponent.hide();
                         document.location.reload();
                         this.game();
                     })
