@@ -6,24 +6,42 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/google/uuid"
-	"github.com/nbaztec/battleships/src/models"
+	"github.com/nbaztec/battleships/src/model"
 	"github.com/pkg/errors"
 )
 
 var (
-	errMissingGameID   = errors.New("missing gameId")
-	errMissingPlayerID = errors.New("missing playerId")
+	errFailGenerateGameID = errors.New("failed generating a game id")
+	errMissingGameID      = errors.New("missing gameId")
+	errMissingPlayerID    = errors.New("missing playerId")
 )
 
-var gameMaster = models.NewGameMaster()
+const (
+	maxGenerateGameIDTries = 15
+)
+
+var gameMaster = model.NewGameMaster()
 
 func StartGameHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-type", "application/json")
 
 	gameID := r.URL.Query().Get("gid")
 	if gameID == "" {
-		http.Redirect(w, r, "/api/game?gid="+uuid.New().String(), http.StatusSeeOther)
+		newGameID := ""
+		for i := 0; i < maxGenerateGameIDTries; i++ {
+			id := model.NewGameID()
+			if !gameMaster.GameExists(id) {
+				newGameID = id
+				break
+			}
+		}
+
+		if newGameID == "" {
+			writeErr(w, errFailGenerateGameID)
+			return
+		}
+
+		http.Redirect(w, r, "/api/game?gid="+newGameID, http.StatusSeeOther)
 		return
 	}
 
@@ -91,7 +109,7 @@ func SetPlayerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var ships []models.Ship
+	var ships []model.Ship
 	if err := json.Unmarshal(body, &ships); err != nil {
 		writeErr(w, err)
 		return
@@ -143,7 +161,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var location models.Point
+	var location model.Point
 	if err := json.Unmarshal(body, &location); err != nil {
 		writeErr(w, err)
 		return

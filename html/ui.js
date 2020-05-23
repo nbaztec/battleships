@@ -10,7 +10,8 @@ const $gameLink = $.extend({}, $('#game-link'), {
     }
 });
 
-const $waitingArea = $('#waiting-area');
+const $waitingOpponent = $('#waiting-opponent');
+const $gameLinkArea = $('#game-link-area');
 
 const $btnOrientIcon = $('#btn-orient i');
 const $btnOrient = $.extend(button('#btn-orient'), {
@@ -27,13 +28,19 @@ const $btnRematch = button('#btn-rematch');
 const $actionsPlan = $('#actions-plan');
 const $actionsPlay = $('#actions-play');
 
+const $turnPlayer = $('#turn-player');
+const $turnOpponent = $('#turn-opponent');
+
 const $gridPlayer = $('#grid-player');
 const $gridOpponent = $('#grid-opponent');
 
 const $resultWin = $('#result-win');
 const $resultLoss = $('#result-loss');
 
-$waitingArea.hide();
+$waitingOpponent.hide();
+$gameLinkArea.hide();
+$turnPlayer.hide();
+$turnOpponent.hide();
 $gridPlayer.hide();
 $gridOpponent.hide();
 $actionsPlan.hide();

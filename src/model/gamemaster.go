@@ -1,4 +1,4 @@
-package models
+package model
 
 import (
 	"errors"
@@ -9,7 +9,22 @@ type GameMaster struct {
 	ActiveGames map[string]*Game
 }
 
+func (g *GameMaster) GC() {
+	var marked []string
+	for _, v := range g.ActiveGames {
+		if time.Now().Sub(v.LastActivity) > 30*time.Minute {
+			marked = append(marked, v.ID)
+		}
+	}
+
+	for _, id := range marked {
+		delete(g.ActiveGames, id)
+	}
+}
+
 func (g *GameMaster) CreateGame(id string) *Game {
+	g.GC()
+
 	game := NewGame(id)
 	g.ActiveGames[id] = game
 
@@ -23,6 +38,11 @@ func (g *GameMaster) GetGame(id string) (*Game, error) {
 	}
 
 	return game, nil
+}
+
+func (g *GameMaster) GameExists(id string) bool {
+	_, ok := g.ActiveGames[id]
+	return ok
 }
 
 func NewGameMaster() *GameMaster {

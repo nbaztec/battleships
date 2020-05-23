@@ -1,4 +1,4 @@
-package models
+package model
 
 import (
 	"errors"
@@ -80,6 +80,7 @@ func (g *Game) Hidden(playerID string) Game {
 
 func (g *Game) NextRevision() {
 	g.Revision = uuid.New().String()
+	g.LastActivity = time.Now()
 }
 
 func (g *Game) Over() bool {
@@ -100,6 +101,11 @@ func (g *Game) AddPlayer() (*Player, error) {
 		g.Player2 = &p
 		g.State = GameStatePlanning
 		g.NextRevision()
+
+		// allow player2 to go first half of the time
+		if random.Intn(2) == 1 {
+			g.NextPlayerID = p.ID
+		}
 	} else {
 		return nil, errors.New("lobby full")
 	}
@@ -162,12 +168,13 @@ func (g *Game) Resign(playerID string) error {
 	}
 
 	g.State = GameStateFinished
+	g.NextRevision()
 
 	return nil
 }
 
 func (g *Game) Rematch(playerID string) error {
-	if g.Player1.ID != playerID || g.Player2.ID != playerID {
+	if g.Player1.ID != playerID && g.Player2.ID != playerID {
 		return errInvalidPlayerID
 	}
 
@@ -210,17 +217,19 @@ func (g *Game) Reset() {
 	g.WinnerPlayerID = ""
 	g.NextPlayerID = nextPlayerID
 	g.rematchRequest = map[string]struct{}{}
-	g.Revision = uuid.New().String()
 	g.State = GameStatePlanning
 	g.Player1.Reset()
+	g.Player2.Reset()
+	g.NextRevision()
 }
 
 func NewGame(id string) *Game {
 	return &Game{
-		ID:           id,
-		State:        GameStateInitial,
-		LastActivity: time.Now().UTC(),
-		Revision:     uuid.New().String(),
+		ID:             id,
+		State:          GameStateInitial,
+		LastActivity:   time.Now().UTC(),
+		Revision:       uuid.New().String(),
+		rematchRequest: map[string]struct{}{},
 	}
 }
 

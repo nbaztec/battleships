@@ -56,7 +56,8 @@ class API {
     }
 
     _startPlanUI() {
-        $waitingArea.hide();
+        $waitingOpponent.hide();
+        $gameLinkArea.hide();
         $actionsPlan.show();
         $gridPlayer.show();
         $btnReset.enable();
@@ -79,7 +80,8 @@ class API {
     }
 
     _startPlayUI() {
-        $waitingArea.hide();
+        $waitingOpponent.hide();
+        $gameLinkArea.hide();
         $gridPlayer.show();
         $gridOpponent.show();
         $actionsPlan.hide();
@@ -188,7 +190,8 @@ class API {
                     this._pid = pid;
 
                     if (this._state.state === GameStateInitial) {
-                        $waitingArea.show();
+                        $waitingOpponent.show();
+                        $gameLinkArea.show();
                         $gameLink.setLink();
                         this.waitForConnect();
                     } else if (this._state.state === GameStatePlanning) {
@@ -204,6 +207,7 @@ class API {
     }
 
     waitGameBegin() {
+        $waitingOpponent.show();
         if (this._state.state === GameStatePlaying) {
             this._startPlayUI();
             return;
@@ -234,9 +238,6 @@ class API {
         return axios.post(`/api/set?gid=${gid}&pid=${pid}`, this.gridPlan.shipsSorted)
             .then((res) => {
                 this._state = res.data;
-                $btnReady.disable();
-                $btnReset.disable();
-                $btnOrient.disable();
                 this.waitGameBegin();
             })
             .catch(showError);
@@ -272,20 +273,29 @@ class API {
         this.updateState();
     }
 
+    gameStatus() {
+        return axios.get(`/api/game?gid=${this._gid}&pid=${this._pid}`)
+            .then((response) => {
+                this._state = response.data;
+            });
+    }
+
     onPlayerTurn() {
         return new Promise((resolve, reject) => {
             const refresh = () => {
                 setTimeout(() => {
-                    axios.get(`/api/game?gid=${this._gid}&pid=${this._pid}`)
-                        .then((response) => {
-                            this._state = response.data;
+                    this.gameStatus()
+                        .then(() => {
                             if (this.gameFinished()) {
                                 resolve();
                                 return;
                             }
 
                             // opponent's turn
-                            if (response.data.nextPlayerId === '-') {
+                            if (this._state.nextPlayerId === '-') {
+                                $turnPlayer.hide();
+                                $turnOpponent.show();
+
                                 this.doOpponentTurn();
                                 refresh();
                                 return;
@@ -293,6 +303,9 @@ class API {
 
                             this.doOpponentTurn();
                             this.updateState();
+                            $turnOpponent.hide();
+                            $turnPlayer.show();
+
                             resolve();
                         })
                         .catch(reject);
@@ -320,6 +333,8 @@ class API {
                         if (this.gameFinished()) {
                             return;
                         }
+                        $turnPlayer.hide();
+                        $turnOpponent.show();
 
                         this.waitTurn();
                     });
@@ -405,6 +420,36 @@ class API {
             .then((res) => {
                 this._state = res.data;
                 this.gameFinished();
+            })
+            .catch(console.err)
+    }
+
+    waitForRematch() {
+        const refresh = () => {
+            setTimeout(() => {
+                this.gameStatus()
+                    .then(() => {
+                        if (this._state.state === GameStateFinished) {
+                            refresh();
+                            return;
+                        }
+
+                        document.location.reload();
+                        this.game();
+                    })
+            }, 1000)
+        }
+
+        refresh();
+    }
+
+    rematch() {
+        const gid = params.get('gid');
+        const pid = params.get('pid');
+        return axios.post(`/api/rematch?gid=${gid}&pid=${pid}`)
+            .then((res) => {
+                this._state = res.data;
+                this.waitForRematch();
             })
             .catch(console.err)
     }

@@ -50,11 +50,11 @@
 </nav>
 
 <main role="main" class="col-md-12">
-  <div id="waiting-area" class="col-md-12" style="display: none">
-    <h2>Waiting for Opponent...</h2>
-    <div class="alert alert-primary" role="alert">
-      <h3>Game Link: <code id="game-link"></code></h3>
-    </div>
+  <div id="waiting-opponent" class="alert alert-primary" role="alert" style="display: none">
+    <h3 class="text-center">⏳ Waiting for Opponent...</h3>
+  </div>
+  <div id="game-link-area" class="alert alert-primary" role="alert" style="display: none">
+    <h3>Game Link: <code id="game-link"></code></h3>
   </div>
   <div id="result-win" class="alert alert-success" role="alert" style="display: none">
     <h1>Congratulations! You won 🎉</h1>
@@ -77,6 +77,12 @@
   <hr />
 
   <div id="grid-area">
+    <div id="turn-opponent" class="alert alert-warning" role="alert" style="display:none;">
+      <h4 class="text-center">&bigstar; Opponent's turn &bigstar;</h4>
+    </div>
+    <div id="turn-player" class="alert alert-primary" role="alert" style="display:none;">
+      <h4 class="text-center">&bigstar; Your turn &bigstar;</h4>
+    </div>
     <canvas id="grid-opponent" width="550" height="500" style="border-right: 1px solid darkgray;" style="display:none"></canvas>
     <canvas id="grid-player" width="550" height="500" class="ml-5" style="display:none"></canvas>
   </div>

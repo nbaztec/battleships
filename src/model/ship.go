@@ -1,4 +1,4 @@
-package models
+package model
 
 type ShipPoint struct {
 	Point

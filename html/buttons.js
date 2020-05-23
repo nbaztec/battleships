@@ -23,7 +23,13 @@ $(function() {
       return;
     }
 
-    api.setShips().catch(console.error);
+    api.setShips()
+        .then(() => {
+          $btnReady.disable();
+          $btnReset.disable();
+          $btnOrient.disable();
+        })
+        .catch(console.error);
   });
 
   $btnResign.click(() => {
@@ -31,9 +37,24 @@ $(function() {
       return;
     }
 
-    $btnResign.disable();
-    $btnReady.disable();
+    api.resign()
+        .then(() => {
+          $btnResign.disable();
+          $btnRematch.enable();
+        })
+        .catch(console.error);
+  });
 
-    api.resign().catch(console.error);
+  $btnRematch.click(() => {
+    if (!$btnRematch.enabled()) {
+      return;
+    }
+
+    api.rematch()
+        .then(() => {
+          $btnRematch.disable();
+          $btnResign.disable();
+        })
+        .catch(console.error);
   })
 });
