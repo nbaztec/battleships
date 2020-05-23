@@ -8,7 +8,8 @@ import (
 )
 
 var (
-	errGameOver = errors.New("game is over")
+	errGameOver        = errors.New("game is over")
+	errInvalidPlayerID = errors.New("invalid player id")
 )
 
 type GameState int
@@ -29,6 +30,7 @@ type Game struct {
 	WinnerPlayerID string    `json:"winnerPlayerId"`
 	LastActivity   time.Time `json:"lastActivity"`
 	Revision       string    `json:"revision"`
+	rematchRequest map[string]struct{}
 }
 
 func (g *Game) Hidden(playerID string) Game {
@@ -39,6 +41,7 @@ func (g *Game) Hidden(playerID string) Game {
 		NextPlayerID:   g.NextPlayerID,
 		WinnerPlayerID: g.WinnerPlayerID,
 		Revision:       g.Revision,
+		rematchRequest: g.rematchRequest,
 	}
 
 	if g.Player1 == nil || g.Player2 == nil {
@@ -149,6 +152,33 @@ func (g *Game) NextTurn() {
 	}
 }
 
+func (g *Game) Resign(playerID string) error {
+	if g.Player1.ID == playerID {
+		g.WinnerPlayerID = g.Player2.ID
+	} else if g.Player2.ID == playerID {
+		g.WinnerPlayerID = g.Player1.ID
+	} else {
+		return errInvalidPlayerID
+	}
+
+	g.State = GameStateFinished
+
+	return nil
+}
+
+func (g *Game) Rematch(playerID string) error {
+	if g.Player1.ID != playerID || g.Player2.ID != playerID {
+		return errInvalidPlayerID
+	}
+
+	g.rematchRequest[playerID] = struct{}{}
+	if len(g.rematchRequest) == 2 {
+		g.Reset()
+	}
+
+	return nil
+}
+
 func (g *Game) SetPlayer(playerID string, ships []Ship) error {
 	if g.Over() {
 		return errGameOver
@@ -169,6 +199,20 @@ func (g *Game) SetPlayer(playerID string, ships []Ship) error {
 	default:
 		return errors.New("invalid playerId")
 	}
+}
+
+func (g *Game) Reset() {
+	nextPlayerID := g.Player1.ID
+	if g.WinnerPlayerID == g.Player1.ID {
+		nextPlayerID = g.Player2.ID
+	}
+
+	g.WinnerPlayerID = ""
+	g.NextPlayerID = nextPlayerID
+	g.rematchRequest = map[string]struct{}{}
+	g.Revision = uuid.New().String()
+	g.State = GameStatePlanning
+	g.Player1.Reset()
 }
 
 func NewGame(id string) *Game {

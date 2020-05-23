@@ -15,7 +15,7 @@ $(function() {
       return;
     }
 
-    api.placeShips().then(console.log).catch(console.error);
+    api.placeShips().catch(console.error);
   });
 
   $btnReady.click(() => {
@@ -23,7 +23,7 @@ $(function() {
       return;
     }
 
-    api.setShips().then(console.log).catch(console.error);
+    api.setShips().catch(console.error);
   });
 
   $btnResign.click(() => {
@@ -34,6 +34,6 @@ $(function() {
     $btnResign.disable();
     $btnReady.disable();
 
-    alert('resign!');
+    api.resign().catch(console.error);
   })
 });

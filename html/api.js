@@ -36,11 +36,10 @@ class API {
         this._gid = null;
         this._pid = null;
         this._state = {};
-        this.grid = null;
-        this.gridPlay = null;
+        this._finished = false;
         this._revision = null;
         this._lastOpponentTurn = {
-            revision: null,
+            id: null,
             action: null,
         };
 
@@ -119,7 +118,7 @@ class API {
         this.gridPlay.drawPlayField();
     }
 
-    wait() {
+    waitForConnect() {
         if (this._state.state === GameStatePlanning) {
             this._startPlanUI();
             return;
@@ -132,7 +131,7 @@ class API {
                         this._state = res.data;
                         this._startPlanUI();
                     } else {
-                        this.wait();
+                        this.waitForConnect();
                     }
                 })
                 .catch(console.err)
@@ -182,19 +181,22 @@ class API {
                 })
                 .catch(showError);
         } else {
-            $gameLink.setLink();
             return axios.get(`/api/game?gid=${gid}&pid=${pid}`)
                 .then((response) => {
                     this._state = response.data;
                     this._gid = gid;
                     this._pid = pid;
 
-                    if ([GameStateInitial, GameStatePlanning].includes(this._state.state)) {
-                        this.wait();
-                    } else if ([GameStatePlaying].includes(this._state.state)) {
+                    if (this._state.state === GameStateInitial) {
+                        $waitingArea.show();
+                        $gameLink.setLink();
+                        this.waitForConnect();
+                    } else if (this._state.state === GameStatePlanning) {
+                        this.waitForConnect();
+                    } else if (this._state.state === GameStatePlaying) {
                         this.waitGameBegin();
                     } else {
-                        this.hasWon();
+                        this.gameFinished();
                     }
                 })
                 .catch(showError);
@@ -242,16 +244,22 @@ class API {
 
 
     doOpponentTurn() {
-        if (this._lastOpponentTurn.revision === this._state.revision) {
+        if (!this._opponent.lastAction) {
+            return;
+        }
+
+        console.log(this._lastOpponentTurn.id, this._opponent.lastAction.id)
+        if (this._lastOpponentTurn.id === this._opponent.lastAction.id) {
             return;
         }
         this._lastOpponentTurn = {
-            revision: this._state.revision,
+            id: this._opponent.lastAction.id,
             action: this._opponent.lastAction,
         };
 
 
         if (!this._opponent.lastAction.hitShipId.length) {
+            console.log('OPPONENT MISS')
             audioMiss.stopAndPlay();
         } else {
             if (this._opponent.lastAction.sunk) {
@@ -271,6 +279,10 @@ class API {
                     axios.get(`/api/game?gid=${this._gid}&pid=${this._pid}`)
                         .then((response) => {
                             this._state = response.data;
+                            if (this.gameFinished()) {
+                                resolve();
+                                return;
+                            }
 
                             // opponent's turn
                             if (response.data.nextPlayerId === '-') {
@@ -279,6 +291,7 @@ class API {
                                 return;
                             }
 
+                            this.doOpponentTurn();
                             this.updateState();
                             resolve();
                         })
@@ -293,7 +306,7 @@ class API {
     waitTurn() {
         this.onPlayerTurn()
             .then(() => {
-                if (this.hasWon()) {
+                if (this.gameFinished()) {
                     return;
                 }
 
@@ -304,7 +317,7 @@ class API {
 
                 return this.check()
                     .then(() => {
-                        if (this.hasWon()) {
+                        if (this.gameFinished()) {
                             return;
                         }
 
@@ -324,7 +337,6 @@ class API {
 
         return new Promise((resolve, _) => {
             this.gridPlay.check(this._player.turns, (row, col) => {
-                console.log("check!", row, col)
                 return resolve([row, col]);
             });
         })
@@ -337,6 +349,7 @@ class API {
                     this._state = res.data;
                     const action = this._player.lastAction;
                     if (!action.hitShipId.length) {
+                        console.log('PLAYER MISS')
                         audioMiss.stopAndPlay();
                     } else {
                         if (action.sunk) {
@@ -347,18 +360,52 @@ class API {
                      }
                     this.updateState();
                 })
-                .catch(showError);
+                .catch((err) => {
+                    if (err.response) {
+                        if (err.response.data.message === 'game is over') {
+                            this.game();
+                            return;
+                        }
+                    }
+
+                    showError(err)
+                });
         });
     }
 
-    hasWon() {
+    gameFinished() {
+        console.log(this._finished)
+        if (this._finished) {
+            return true;
+        }
+
         if (!this._state.winnerPlayerId.length) {
             return false;
         }
 
-        const msg = (this._state.winnerPlayerId === this._pid) ? 'you won :D' : 'opponent won :(';
-        alert(msg);
+        this._finished = true;
+        if (this._state.winnerPlayerId === this._pid) {
+            audioWin.stopAndPlay();
+            $resultWin.show();
+        } else {
+            audioLoss.stopAndPlay();
+            $resultLoss.show();
+        }
 
-        return false;
+        $btnResign.disable();
+        $btnRematch.enable();
+
+        return true;
+    }
+
+    resign() {
+        const gid = params.get('gid');
+        const pid = params.get('pid');
+        return axios.post(`/api/resign?gid=${gid}&pid=${pid}`)
+            .then((res) => {
+                this._state = res.data;
+                this.gameFinished();
+            })
+            .catch(console.err)
     }
 }

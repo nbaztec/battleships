@@ -11,18 +11,12 @@ var (
 	errShipNotFound = errors.New("ship not found")
 )
 
-type LastAction struct {
-	Position  Point  `json:"position"`
-	HitShipID string `json:"hitShipId"`
-	Sunk      bool   `json:"sunk"`
-}
-
 type Player struct {
 	ID             string          `json:"id"`
 	Ships          map[string]Ship `json:"ships"`
 	Grid           Grid            `json:"-"`
 	Turns          map[string]bool `json:"turns"`
-	LastAction     *LastAction     `json:"lastAction"`
+	LastAction     *Action         `json:"lastAction"`
 	ShipsRemaining int             `json:"shipsRemaining"`
 }
 
@@ -84,9 +78,7 @@ func (p *Player) Check(location Point, opponent *Player) (bool, error) {
 		return false, errors.New("point already marked")
 	}
 
-	p.LastAction = &LastAction{
-		Position: location,
-	}
+	p.LastAction = newAction(location)
 
 	v := opponent.Grid.Value(location)
 	if v != GridCellEmpty {
@@ -108,10 +100,23 @@ func (p *Player) Check(location Point, opponent *Player) (bool, error) {
 	return found, nil
 }
 
+func (p *Player) Reset() {
+	p.LastAction = nil
+	p.Turns = map[string]bool{}
+	p.Grid = NewGrid()
+	p.Ships = make(map[string]Ship)
+	p.ShipsRemaining = 0
+
+	for _, ship := range NewDefaultShips() {
+		p.Ships[ship.ID] = ship
+		p.ShipsRemaining++
+	}
+}
+
 func NewPlayer() Player {
 	p := Player{
 		ID:    uuid.New().String(),
-		Grid:  NewGrid(10),
+		Grid:  NewGrid(),
 		Turns: map[string]bool{},
 	}
 

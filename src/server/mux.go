@@ -8,6 +8,8 @@ func NewMux() *http.ServeMux {
 	mux.Handle("/api/game", http.HandlerFunc(StartGameHandler))
 	mux.Handle("/api/set", http.HandlerFunc(SetPlayerHandler))
 	mux.Handle("/api/check", http.HandlerFunc(CheckHandler))
+	mux.Handle("/api/resign", http.HandlerFunc(ResignHandler))
+	mux.Handle("/api/rematch", http.HandlerFunc(RematchHandler))
 
 	mux.Handle("/api/status", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("OK"))

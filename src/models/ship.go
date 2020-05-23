@@ -61,14 +61,14 @@ func NewDefaultShips() []Ship {
 		{
 			ID:       "s2",
 			Size:     3,
-			Color:    "#B0C4DE",
+			Color:    "#B0E0E6",
 			Position: newShipPoint(),
 			Order:    2,
 		},
 		{
 			ID:       "s3",
 			Size:     3,
-			Color:    "#B0E0E6",
+			Color:    "#20B2AA",
 			Position: newShipPoint(),
 			Order:    3,
 		},

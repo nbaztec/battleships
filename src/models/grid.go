@@ -11,7 +11,8 @@ var (
 )
 
 const (
-	GridCellEmpty = ""
+	GridCellEmpty   = ""
+	DefaultGridSize = 10
 )
 
 type Grid struct {
@@ -64,7 +65,13 @@ func (g *Grid) Print() error {
 	return nil
 }
 
-func NewGrid(size int) Grid {
+func NewGrid() Grid {
+	return Grid{
+		Size: DefaultGridSize,
+	}
+}
+
+func NewGridOfSize(size int) Grid {
 	return Grid{
 		Size: size,
 	}

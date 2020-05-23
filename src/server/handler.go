@@ -163,6 +163,86 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(b)
 }
 
+func ResignHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-type", "application/json")
+
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	gameID := r.URL.Query().Get("gid")
+	if gameID == "" {
+		writeErr(w, errMissingGameID)
+		return
+	}
+
+	playerID := r.URL.Query().Get("pid")
+	if playerID == "" {
+		writeErr(w, errMissingPlayerID)
+		return
+	}
+
+	game, err := gameMaster.GetGame(gameID)
+	if err != nil {
+		writeErr(w, err)
+		return
+	}
+
+	if err := game.Resign(playerID); err != nil {
+		writeErr(w, err)
+		return
+	}
+
+	b, err := json.Marshal(game.Hidden(playerID))
+	if err != nil {
+		writeErr(w, err)
+		return
+	}
+
+	w.Write(b)
+}
+
+func RematchHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-type", "application/json")
+
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	gameID := r.URL.Query().Get("gid")
+	if gameID == "" {
+		writeErr(w, errMissingGameID)
+		return
+	}
+
+	playerID := r.URL.Query().Get("pid")
+	if playerID == "" {
+		writeErr(w, errMissingPlayerID)
+		return
+	}
+
+	game, err := gameMaster.GetGame(gameID)
+	if err != nil {
+		writeErr(w, err)
+		return
+	}
+
+	if err := game.Rematch(playerID); err != nil {
+		writeErr(w, err)
+		return
+	}
+
+	b, err := json.Marshal(game.Hidden(playerID))
+	if err != nil {
+		writeErr(w, err)
+		return
+	}
+
+	w.Write(b)
+}
+
 func writeErr(w http.ResponseWriter, err error) {
 	b, err := json.Marshal(struct {
 		Message string `json:"message"`

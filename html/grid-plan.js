@@ -55,10 +55,10 @@ class GridPlan extends GridBase {
     })
 
     this.enableMove((row, col) => {
-      // console.log(x, y);
-      const n = VerticalMode ? col : row;
+      // console.log(row, col);
+      const otherDim = VerticalMode ? row : col;
 
-      if (!this._testBound(n, this._size, ship.size)) {
+      if (!this._testBound(otherDim, this._size, ship.size)) {
         return;
       }
 
@@ -90,9 +90,9 @@ class GridPlan extends GridBase {
 
     this.enableClick((row, col) => {
       // console.log(x, y);
-      const n = VerticalMode ?  col: row;
+      const otherDim = VerticalMode ?  row: col;
 
-      if (!this._testBound(n, this._size, ship.size)) {
+      if (!this._testBound(otherDim, this._size, ship.size)) {
         return;
       }
 

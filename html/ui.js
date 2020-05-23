@@ -22,6 +22,7 @@ const $btnOrient = $.extend(button('#btn-orient'), {
 const $btnReset = button('#btn-reset');
 const $btnReady = button('#btn-ready');
 const $btnResign = button('#btn-resign');
+const $btnRematch = button('#btn-rematch');
 
 const $actionsPlan = $('#actions-plan');
 const $actionsPlay = $('#actions-play');
@@ -29,11 +30,16 @@ const $actionsPlay = $('#actions-play');
 const $gridPlayer = $('#grid-player');
 const $gridOpponent = $('#grid-opponent');
 
+const $resultWin = $('#result-win');
+const $resultLoss = $('#result-loss');
 
+$waitingArea.hide();
 $gridPlayer.hide();
 $gridOpponent.hide();
 $actionsPlan.hide();
 $actionsPlay.hide();
+$resultWin.hide();
+$resultLoss.hide();
 
 function button(id) {
     return $.extend({}, $(id), {
