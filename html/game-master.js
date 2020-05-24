@@ -111,6 +111,7 @@ class GameMaster {
         $gridOpponent.show();
         $btnResign.disable();
         $btnRematch.enable();
+        $actionsPlan.hide();
         $actionsPlay.show();
 
         if (this._won) {
@@ -277,7 +278,16 @@ class GameMaster {
                 this._state = res.data;
                 this.waitGameBegin();
             })
-            .catch(showError);
+            .catch((err) => {
+                if (err.response) {
+                    if (err.response.data.message === 'game is over') {
+                        this.begin();
+                        return;
+                    }
+                }
+
+                showError(err)
+            });
     }
 
 
