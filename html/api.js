@@ -6,13 +6,14 @@ class API {
             }
             return acc;
         }, {});
-        return axios.get(`/api/game`, {
-            params: [p],
+
+        return axios.get(`/api/game/create`, {
+            params: p,
         });
     }
 
     joinGame(gid) {
-        return axios.get(`/api/game`, {
+        return axios.get(`/api/game/join`, {
             params: {
                 gid,
             },

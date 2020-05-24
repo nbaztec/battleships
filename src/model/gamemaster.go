@@ -9,6 +9,11 @@ const (
 	DefaultGCDuration = 30 * time.Minute
 )
 
+var (
+	errGameNotFound      = errors.New("game not found")
+	errGameAlreadyExists = errors.New("game already exists")
+)
+
 type GameMaster struct {
 	ActiveGames map[string]*Game
 }
@@ -26,13 +31,17 @@ func (g *GameMaster) GC() {
 	}
 }
 
-func (g *GameMaster) CreateGame(id string, gridSize int) *Game {
+func (g *GameMaster) CreateGame(id string, gridSize int) (*Game, error) {
 	g.GC()
+
+	if _, ok := g.ActiveGames[id]; ok {
+		return nil, errGameAlreadyExists
+	}
 
 	game := NewGame(id, gridSize)
 	g.ActiveGames[id] = game
 
-	return game
+	return game, nil
 }
 
 func (g *GameMaster) GetGame(id string) (*Game, error) {
@@ -42,6 +51,23 @@ func (g *GameMaster) GetGame(id string) (*Game, error) {
 	}
 
 	return game, nil
+}
+
+func (g *GameMaster) GetGameWithPlayer(id, playerID string) (*Game, error) {
+	game, ok := g.ActiveGames[id]
+	if !ok {
+		return nil, errGameNotFound
+	}
+
+	if game.Player1 != nil && game.Player1.ID == playerID {
+		return game, nil
+	}
+
+	if game.Player2 != nil && game.Player2.ID == playerID {
+		return game, nil
+	}
+
+	return nil, errGameNotFound
 }
 
 func (g *GameMaster) GameExists(id string) bool {

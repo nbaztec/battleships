@@ -12,6 +12,10 @@ const $gameLink = $.extend({}, $('#game-link'), {
     }
 });
 
+const $startArea = $('#start-area');
+const $joinGame = $('#join-game');
+const $createGame = $('#create-game');
+
 const $waitingOpponent = $('#waiting-opponent');
 const $gameLinkArea = $('#game-link-area');
 
@@ -24,6 +28,7 @@ const $btnOrient = $.extend(button('#btn-orient'), {
 });
 const $btnReset = button('#btn-reset');
 const $btnReady = button('#btn-ready');
+const $btnPlanResign = button('#btn-plan-resign');
 const $btnResign = button('#btn-resign');
 const $btnRematch = button('#btn-rematch');
 
@@ -71,6 +76,23 @@ $(function() {
         }
     });
 
+    $joinGame.submit((e) => {
+        const gameId = $joinGame.find('input[name=game-id]').val();
+        gameMaster.joinGame(gameId)
+            .catch(alert);
+
+        e.preventDefault();
+    });
+
+    $createGame.submit((e) => {
+        const gameId = $createGame.find('input[name=game-id]').val();
+        const gridSize = $createGame.find('input[name=grid-size]').val();
+        const shipCount = $createGame.find('input[name=ship-count]').val();
+        gameMaster.createGame(gameId, gridSize, shipCount)
+            .catch(alert);
+        e.preventDefault();
+    })
+
     $btnOrient.click((e) => {
         VerticalMode = !VerticalMode;
         $btnOrient.toggleIcon();
@@ -94,6 +116,21 @@ $(function() {
                 $btnReady.disable();
                 $btnReset.disable();
                 $btnOrient.disable();
+            })
+            .catch(console.error);
+    });
+
+    $btnPlanResign.click(() => {
+        if (!$btnPlanResign.enabled()) {
+            return;
+        }
+
+        gameMaster.resignPlan()
+            .then(() => {
+                $actionsPlan.hide();
+                $actionsPlay.show();
+                $btnPlanResign.disable();
+                $btnReady.disable();
             })
             .catch(console.error);
     });

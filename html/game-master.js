@@ -61,7 +61,12 @@ class GameMaster {
         this.gridPlay = new GridOpponent('grid-opponent', {}, this._state.gridSize);
     }
 
+    _startMainUI() {
+        $startArea.show();
+    }
+
     _startPlanUI() {
+        $startArea.hide();
         $waitingOpponent.hide();
         $gameLinkArea.hide();
         $actionsPlan.show();
@@ -119,6 +124,32 @@ class GameMaster {
         audioStart.stopAndPlay();
     }
 
+    createGame(id, gridSize, shipCount) {
+        return this._api.createGame(id, gridSize)
+            .then((res) => {
+                this._state = res.data;
+                const pid = this._state.player2 ? this._state.player2.id : this._state.player1.id;
+                setQuery({
+                    gid: res.data.id,
+                    pid,
+                });
+            })
+            .catch(showError);
+    }
+
+    joinGame(id) {
+        return this._api.joinGame(id)
+            .then((res) => {
+                this._state = res.data;
+                const pid = this._state.player2 ? this._state.player2.id : this._state.player1.id;
+                setQuery({
+                    gid: res.data.id,
+                    pid,
+                });
+            })
+            .catch(showError);
+    }
+
     placeShips() {
         return new Promise((resolve, _) => {
             this.gridPlan.reset();
@@ -167,29 +198,13 @@ class GameMaster {
         }, 1000);
     }
 
-    game() {
+    begin() {
         const gid = params.get('gid');
         const pid = params.get('pid');
 
         if (!gid && !pid) {
-            return this._api.createGame(this._gid, this._size)
-                .then((res) => {
-                    this._state = res.data;
-                })
-                .then(() => {
-                    if (!this._state.id) {
-                        throw new Error('could not find game id');
-                    }
-
-                    this._gid = this._state.id;
-                    this._pid = this._state.player2 ? this._state.player2.id : this._state.player1.id;
-
-                    setQuery({
-                        gid: this._gid,
-                        pid: this._pid,
-                    });
-                })
-                .catch(showError);
+            this._startMainUI();
+            return Promise.resolve();
         } else if (!pid) {
             return this._api.joinGame(this._gid)
                 .then((response) => {
@@ -390,7 +405,7 @@ class GameMaster {
                 .catch((err) => {
                     if (err.response) {
                         if (err.response.data.message === 'game is over') {
-                            this.game();
+                            this.begin();
                             return;
                         }
                     }
@@ -417,6 +432,20 @@ class GameMaster {
         return true;
     }
 
+    resignPlan() {
+        return this._api.resign(this._gid, this._pid)
+            .then((res) => {
+                this._state = res.data;
+                this.gridPlan.drawPlanField();
+                this.gridPlan.disableMove();
+                this.gridPlan.disableClick();
+                this.gridPlan.disableEscape();
+
+                this.gameFinished();
+            })
+            .catch(console.err)
+    }
+
     resign() {
         return this._api.resign(this._gid, this._pid)
             .then((res) => {
@@ -439,7 +468,6 @@ class GameMaster {
 
                         $waitingOpponent.hide();
                         document.location.reload();
-                        this.game();
                     })
             }, 1000)
         }

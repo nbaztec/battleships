@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -25,12 +24,13 @@ const (
 
 var gameMaster = model.NewGameMaster()
 
-func StartGameHandler(w http.ResponseWriter, r *http.Request) {
+func CreateGameHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-type", "application/json")
 
 	gridSize := defaultGridSize
 	gameID := r.URL.Query().Get("gid")
 	size := r.URL.Query().Get("size")
+
 	if size != "" {
 		if sz, err := strconv.Atoi(size); err == nil {
 			gridSize = sz
@@ -38,45 +38,64 @@ func StartGameHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if gameID == "" {
-		newGameID := ""
 		for i := 0; i < maxGenerateGameIDTries; i++ {
 			id := model.NewGameID()
 			if !gameMaster.GameExists(id) {
-				newGameID = id
+				gameID = id
 				break
 			}
 		}
 
-		if newGameID == "" {
+		if gameID == "" {
 			writeErr(w, errFailGenerateGameID)
 			return
 		}
+	}
 
-		http.Redirect(w, r, fmt.Sprintf("/api/game?gid=%s&size=%d", newGameID, gridSize), http.StatusSeeOther)
+	game, err := gameMaster.CreateGame(gameID, gridSize)
+	if err != nil {
+		writeErr(w, err)
 		return
 	}
 
+	p, err := game.AddPlayer()
+	if err != nil {
+		writeErr(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/api/game?gid="+gameID+"&pid="+p.ID, http.StatusSeeOther)
+}
+
+func JoinGameHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-type", "application/json")
+
+	gameID := r.URL.Query().Get("gid")
+	game, err := gameMaster.GetGame(gameID)
+	if err != nil {
+		writeErr(w, err)
+		return
+	}
+
+	p, err := game.AddPlayer()
+	if err != nil {
+		writeErr(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/api/game?gid="+gameID+"&pid="+p.ID, http.StatusSeeOther)
+}
+
+func GetGameHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-type", "application/json")
+
+	gameID := r.URL.Query().Get("gid")
 	playerID := r.URL.Query().Get("pid")
 
-	game, err := gameMaster.GetGame(gameID)
-	if playerID == "" {
-		if err != nil {
-			game = gameMaster.CreateGame(gameID, gridSize)
-		}
-
-		p, err := game.AddPlayer()
-		if err != nil {
-			writeErr(w, err)
-			return
-		}
-
-		http.Redirect(w, r, "/api/game?gid="+gameID+"&pid="+p.ID, http.StatusSeeOther)
+	game, err := gameMaster.GetGameWithPlayer(gameID, playerID)
+	if err != nil {
+		writeErr(w, err)
 		return
-	} else {
-		if err != nil {
-			writeErr(w, err)
-			return
-		}
 	}
 
 	b, err := json.Marshal(game.Hidden(playerID))
@@ -85,7 +104,9 @@ func StartGameHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(b)
+	if _, err = w.Write(b); err != nil {
+		log.Print(err)
+	}
 }
 
 func SetPlayerHandler(w http.ResponseWriter, r *http.Request) {
@@ -137,7 +158,9 @@ func SetPlayerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(b)
+	if _, err = w.Write(b); err != nil {
+		log.Print(err)
+	}
 }
 
 func CheckHandler(w http.ResponseWriter, r *http.Request) {
@@ -189,7 +212,9 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(b)
+	if _, err = w.Write(b); err != nil {
+		log.Print(err)
+	}
 }
 
 func ResignHandler(w http.ResponseWriter, r *http.Request) {
@@ -229,7 +254,9 @@ func ResignHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(b)
+	if _, err = w.Write(b); err != nil {
+		log.Print(err)
+	}
 }
 
 func RematchHandler(w http.ResponseWriter, r *http.Request) {
@@ -269,7 +296,9 @@ func RematchHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(b)
+	if _, err = w.Write(b); err != nil {
+		log.Print(err)
+	}
 }
 
 func writeErr(w http.ResponseWriter, err error) {
@@ -284,5 +313,7 @@ func writeErr(w http.ResponseWriter, err error) {
 	}
 
 	w.WriteHeader(http.StatusBadRequest)
-	w.Write(b)
+	if _, err = w.Write(b); err != nil {
+		log.Print(err)
+	}
 }
