@@ -51,97 +51,103 @@
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-</nav>
+  </nav>
 
-<main role="main" class="col-md-12">
-  <div class="container" id="start-area" style="display: none">
-    <div class="row">
-      <div class="col-md" style="border-right: 1px solid gray">
-        <form id="join-game">
-          <div class="form-group">
-            <label>Game ID</label>
-            <input type="text" class="form-control" name="game-id">
-          </div>
-          <button type="submit" id="btn-join-game" class="btn btn-success">Join Existing</button>
-        </form>
-      </div>
-      <div class="col-md">
-        <form id="create-game">
-          <div class="form-group">
-            <label>Game ID</label>
-            <input type="text" class="form-control" name="game-id">
-            <small class="form-text text-muted">Leave empty to create a random game room.</small>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label>Grid Size</label>
-              <input type="number" min="10" max="50" class="form-control" name="grid-size" value="10">
+  <main role="main" class="col-md-12">
+    <div class="container" id="start-area" style="display: none">
+      <div class="row">
+        <div class="col-md" style="border-right: 1px solid gray">
+          <form id="join-game">
+            <div class="form-group">
+              <label>Game ID</label>
+              <input type="text" class="form-control" name="game-id">
             </div>
-            <div class="form-group col-md-6">
-              <label>Ship Count</label>
-              <input type="number" min="10" max="50" class="form-control" name="ship-count" value="10">
+            <button type="submit" id="btn-join-game" class="btn btn-success">Join Existing</button>
+          </form>
+        </div>
+        <div class="col-md">
+          <form id="create-game">
+            <div class="form-group">
+              <label>Game ID</label>
+              <input type="text" class="form-control" name="game-id">
+              <small class="form-text text-muted">Leave empty to create a random game room.</small>
             </div>
-          </div>
-          <button type="submit" id="btn-create-game" class="btn btn-primary">Create New</button>
-        </form>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label>Grid Size</label>
+                <input type="number" min="10" max="50" class="form-control" name="grid-size" value="10">
+              </div>
+              <div class="form-group col-md-6">
+                <label>Ship Count</label>
+                <input type="number" min="10" max="50" class="form-control" name="ship-count" value="10">
+              </div>
+            </div>
+            <button type="submit" id="btn-create-game" class="btn btn-primary">Create New</button>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div id="waiting-opponent" class="alert alert-primary" role="alert" style="display: none">
-    <h3 class="text-center">⏳ Waiting for Opponent...</h3>
-  </div>
-  <div id="game-link-area" class="alert alert-primary" role="alert" style="display: none">
-    <h3>Game Link: <code id="game-link"></code></h3>
-  </div>
-  <div id="result-win" class="alert alert-success" role="alert" style="display: none">
-    <h1>Congratulations! You won 🎉</h1>
-  </div>
-  <div id="result-loss" class="alert alert-danger" role="alert" style="display: none">
-    <h1>Oops! You lost 💥</h1>
-  </div>
-  <div class="col-md-9">
-    <div id="actions-plan" style="display:none">
-      <button id="btn-plan-resign" type="button" class="btn btn-danger"><i class="fas fa-stop"></i> Resign</button>
-      <button id="btn-reset" type="button" class="btn btn-warning disabled"><i class="fas fa-redo"></i> Reset</button>
-      <button id="btn-ready" type="button" class="btn btn-success disabled"><i class="fas fa-play"></i> Ready</button>
-      <button id="btn-orient" type="button" class="btn btn-primary"><i class="fas fa-grip-lines"></i> </button>
+    <div id="waiting-opponent" class="alert alert-primary" role="alert" style="display: none">
+      <h3 class="text-center">⏳ Waiting for Opponent...</h3>
     </div>
-    <div id="actions-play" style="display:none">
-      <button id="btn-rematch" type="button" class="btn btn-success disabled"><i class="fas fa-play"></i> Rematch</button>
-      <button id="btn-resign" type="button" class="btn btn-danger"><i class="fas fa-stop"></i> Resign</button>
+    <div id="game-link-area" class="alert alert-primary" role="alert" style="display: none">
+      <h3>Game Link: <code id="game-link"></code></h3>
     </div>
-  </div>
+    <div id="result-win" class="alert alert-success" role="alert" style="display: none">
+      <h1>Congratulations! You won 🎉</h1>
+    </div>
+    <div id="result-loss" class="alert alert-danger" role="alert" style="display: none">
+      <h1>Oops! You lost 💥</h1>
+    </div>
+    <div class="col-md-9">
+      <div id="actions-plan" style="display:none">
+        <button id="btn-plan-resign" type="button" class="btn btn-danger"><i class="fas fa-stop"></i> Resign</button>
+        <button id="btn-reset" type="button" class="btn btn-warning disabled"><i class="fas fa-redo"></i> Reset</button>
+        <button id="btn-ready" type="button" class="btn btn-success disabled"><i class="fas fa-play"></i> Ready</button>
+        <button id="btn-orient" type="button" class="btn btn-primary"><i class="fas fa-grip-lines"></i> </button>
+      </div>
+      <div id="actions-play" style="display:none">
+        <button id="btn-rematch" type="button" class="btn btn-success disabled"><i class="fas fa-play"></i> Rematch</button>
+        <button id="btn-resign" type="button" class="btn btn-danger"><i class="fas fa-stop"></i> Resign</button>
+      </div>
+    </div>
 
-  <hr />
+    <hr />
 
-  <div id="grid-area">
-    <div id="turn-opponent" class="alert alert-warning" role="alert" style="display:none;">
-      <h4 class="text-center">&bigstar; Opponent's turn &bigstar;</h4>
+    <div id="grid-area">
+      <div id="turn-opponent" class="alert alert-warning" role="alert" style="display:none;">
+        <h4 class="text-center">&bigstar; Opponent's turn &bigstar;</h4>
+      </div>
+      <div id="turn-player" class="alert alert-primary" role="alert" style="display:none;">
+        <h4 class="text-center">&bigstar; Your turn &bigstar;</h4>
+      </div>
+      <canvas id="grid-opponent" width="550" height="500" style="border-right: 1px solid darkgray;" style="display:none"></canvas>
+      <canvas id="grid-player" width="550" height="500" class="ml-5" style="display:none"></canvas>
     </div>
-    <div id="turn-player" class="alert alert-primary" role="alert" style="display:none;">
-      <h4 class="text-center">&bigstar; Your turn &bigstar;</h4>
-    </div>
-    <canvas id="grid-opponent" width="550" height="500" style="border-right: 1px solid darkgray;" style="display:none"></canvas>
-    <canvas id="grid-player" width="550" height="500" class="ml-5" style="display:none"></canvas>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="./audio.js"></script>
-  <script src="./ui.js"></script>
-  <script src="./grid-base.js"></script>
-  <script src="grid-player.js"></script>
-  <script src="grid-opponent.js"></script>
-  <script src="./api.js"></script>
-  <script src="./game-master.js"></script>
-  <script>
-    const gameMaster = new GameMaster();
-  </script>
-  <script>
-    $(function() {
-      gameMaster.begin().then(console.log).catch(console.error);
-    });
-  </script>
-  </main>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./audio.js"></script>
+    <script src="./ui.js"></script>
+    <script src="./grid-base.js"></script>
+    <script src="grid-player.js"></script>
+    <script src="grid-opponent.js"></script>
+    <script src="./api.js"></script>
+    <script src="./game-master.js"></script>
+    <script>
+      const gameMaster = new GameMaster();
+    </script>
+    <script>
+      $(function() {
+        gameMaster.begin().then(console.log).catch(console.error);
+      });
+    </script>
+    </main>
+    <footer class="mt-5 pb-3 bg-light">
+      <hr />
+      <div class="text-right pr-5">
+        <small><a href="http://github.com/nbaztec"><img src="github.png" height="15px" /> nbaztec</a></small>
+      </div>
+    </footer>
   </body>
 </html>
