@@ -1,6 +1,6 @@
 class API {
-    createGame(gid, size) {
-        const p = [['gid', gid], ['size', size]].reduce((acc, [k, v]) => {
+    createGame(gid, size, ships) {
+        const p = [['gid', gid], ['size', size], ['ships', ships]].reduce((acc, [k, v]) => {
             if (v) {
                 acc[k] = v;
             }

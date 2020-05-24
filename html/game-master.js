@@ -57,8 +57,8 @@ class GameMaster {
     }
 
     _initGrids() {
-        this.gridPlan = new GridPlayer('grid-player', {}, this._state.gridSize);
-        this.gridPlay = new GridOpponent('grid-opponent', {}, this._state.gridSize);
+        this.gridPlan = new GridPlayer('grid-player', this._state.shipsSpec, this._state.gridSize);
+        this.gridPlay = new GridOpponent('grid-opponent', this._state.shipsSpec, this._state.gridSize);
     }
 
     _startMainUI() {
@@ -125,7 +125,7 @@ class GameMaster {
     }
 
     createGame(id, gridSize, shipCount) {
-        return this._api.createGame(id, gridSize)
+        return this._api.createGame(id, gridSize, shipCount)
             .then((res) => {
                 this._state = res.data;
                 const pid = this._state.player2 ? this._state.player2.id : this._state.player1.id;
@@ -272,7 +272,7 @@ class GameMaster {
     }
 
     setShips() {
-        return this._api.set(this._gid, this._pid, this.gridPlan.shipsSorted)
+        return this._api.set(this._gid, this._pid, this.gridPlan.ships)
             .then((res) => {
                 this._state = res.data;
                 this.waitGameBegin();
@@ -450,6 +450,10 @@ class GameMaster {
         return this._api.resign(this._gid, this._pid)
             .then((res) => {
                 this._state = res.data;
+                this.gridPlay.drawPlayField();
+                this.gridPlay.disableMove();
+                this.gridPlay.disableClick();
+
                 this.gameFinished();
             })
             .catch(console.err)

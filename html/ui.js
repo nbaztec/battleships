@@ -88,6 +88,7 @@ $(function() {
         const gameId = $createGame.find('input[name=game-id]').val();
         const gridSize = $createGame.find('input[name=grid-size]').val();
         const shipCount = $createGame.find('input[name=ship-count]').val();
+
         gameMaster.createGame(gameId, gridSize, shipCount)
             .catch(alert);
         e.preventDefault();

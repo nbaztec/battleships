@@ -100,20 +100,20 @@ func (p *Player) Check(location Point, opponent *Player) (bool, error) {
 	return found, nil
 }
 
-func (p *Player) Reset() {
+func (p *Player) Reset(shipsSpec []ShipSpec) {
 	p.LastAction = nil
 	p.Turns = map[string]bool{}
 	p.Grid.Reset()
 	p.Ships = make(map[string]Ship)
 	p.ShipsRemaining = 0
 
-	for _, ship := range NewDefaultShips() {
-		p.Ships[ship.ID] = ship
+	for _, shipSpec := range shipsSpec {
+		p.Ships[shipSpec.ID] = NewShip(shipSpec)
 		p.ShipsRemaining++
 	}
 }
 
-func NewPlayer(gridSize int) Player {
+func NewPlayer(gridSize int, shipsSpec []ShipSpec) Player {
 	p := Player{
 		ID:    uuid.New().String(),
 		Grid:  NewGrid(gridSize),
@@ -122,8 +122,8 @@ func NewPlayer(gridSize int) Player {
 
 	p.Ships = make(map[string]Ship)
 
-	for _, ship := range NewDefaultShips() {
-		p.Ships[ship.ID] = ship
+	for _, shipSpec := range shipsSpec {
+		p.Ships[shipSpec.ID] = NewShip(shipSpec)
 		p.ShipsRemaining++
 	}
 

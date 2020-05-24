@@ -22,15 +22,16 @@ const (
 )
 
 type Game struct {
-	ID             string    `json:"id"`
-	GridSize       int       `json:"gridSize"`
-	State          GameState `json:"state"`
-	NextPlayerID   string    `json:"nextPlayerId"`
-	Player1        *Player   `json:"player1"`
-	Player2        *Player   `json:"player2"`
-	WinnerPlayerID string    `json:"winnerPlayerId"`
-	LastActivity   time.Time `json:"lastActivity"`
-	Revision       string    `json:"revision"`
+	ID             string     `json:"id"`
+	GridSize       int        `json:"gridSize"`
+	ShipsSpec      []ShipSpec `json:"shipsSpec"`
+	State          GameState  `json:"state"`
+	NextPlayerID   string     `json:"nextPlayerId"`
+	Player1        *Player    `json:"player1"`
+	Player2        *Player    `json:"player2"`
+	WinnerPlayerID string     `json:"winnerPlayerId"`
+	LastActivity   time.Time  `json:"lastActivity"`
+	Revision       string     `json:"revision"`
 	rematchRequest map[string]struct{}
 }
 
@@ -38,6 +39,7 @@ func (g *Game) Hidden(playerID string) Game {
 	game := Game{
 		ID:             g.ID,
 		GridSize:       g.GridSize,
+		ShipsSpec:      g.ShipsSpec,
 		State:          g.State,
 		LastActivity:   g.LastActivity,
 		NextPlayerID:   g.NextPlayerID,
@@ -94,7 +96,7 @@ func (g *Game) AddPlayer() (*Player, error) {
 		return nil, errGameOver
 	}
 
-	p := NewPlayer(g.GridSize)
+	p := NewPlayer(g.GridSize, g.ShipsSpec)
 	if g.Player1 == nil {
 		g.Player1 = &p
 		g.NextPlayerID = p.ID
@@ -220,15 +222,16 @@ func (g *Game) Reset() {
 	g.NextPlayerID = nextPlayerID
 	g.rematchRequest = map[string]struct{}{}
 	g.State = GameStatePlanning
-	g.Player1.Reset()
-	g.Player2.Reset()
+	g.Player1.Reset(g.ShipsSpec)
+	g.Player2.Reset(g.ShipsSpec)
 	g.NextRevision()
 }
 
-func NewGame(id string, gridSize int) *Game {
+func NewGame(id string, gridSize, shipCount int) *Game {
 	return &Game{
 		ID:             id,
 		GridSize:       gridSize,
+		ShipsSpec:      NewShipsSpec(shipCount),
 		State:          GameStateInitial,
 		LastActivity:   time.Now().UTC(),
 		Revision:       uuid.New().String(),

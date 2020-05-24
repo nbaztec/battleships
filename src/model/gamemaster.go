@@ -31,14 +31,14 @@ func (g *GameMaster) GC() {
 	}
 }
 
-func (g *GameMaster) CreateGame(id string, gridSize int) (*Game, error) {
+func (g *GameMaster) CreateGame(id string, gridSize, shipCount int) (*Game, error) {
 	g.GC()
 
 	if _, ok := g.ActiveGames[id]; ok {
 		return nil, errGameAlreadyExists
 	}
 
-	game := NewGame(id, gridSize)
+	game := NewGame(id, gridSize, shipCount)
 	g.ActiveGames[id] = game
 
 	return game, nil

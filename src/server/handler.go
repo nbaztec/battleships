@@ -20,6 +20,7 @@ var (
 const (
 	maxGenerateGameIDTries = 15
 	defaultGridSize        = 10
+	defaultShipCount       = 10
 )
 
 var gameMaster = model.NewGameMaster()
@@ -28,12 +29,20 @@ func CreateGameHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-type", "application/json")
 
 	gridSize := defaultGridSize
+	shipCount := defaultShipCount
+
 	gameID := r.URL.Query().Get("gid")
 	size := r.URL.Query().Get("size")
+	ships := r.URL.Query().Get("ships")
 
 	if size != "" {
-		if sz, err := strconv.Atoi(size); err == nil {
-			gridSize = sz
+		if v, err := strconv.Atoi(size); err == nil {
+			gridSize = v
+		}
+	}
+	if ships != "" {
+		if v, err := strconv.Atoi(ships); err == nil {
+			shipCount = v
 		}
 	}
 
@@ -52,7 +61,7 @@ func CreateGameHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	game, err := gameMaster.CreateGame(gameID, gridSize)
+	game, err := gameMaster.CreateGame(gameID, gridSize, shipCount)
 	if err != nil {
 		writeErr(w, err)
 		return

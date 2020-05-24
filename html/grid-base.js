@@ -1,6 +1,7 @@
 class GridBase {
-  constructor(id, ships, size, blockSize) {
-    this._ships = ships;
+  constructor(id, shipsSpec, size, blockSize) {
+    this._shipsSpec = shipsSpec;
+    this._ships = {};
     this._turns = {};
     this._size = size;
     this._N = blockSize || 40;
@@ -14,24 +15,19 @@ class GridBase {
       partialHitOverlay: '#CD5C5C',
     };
 
+    const shipSpecHeight = 42 * shipsSpec.length;
     this._sizeFactor = size / 10;
     this._e = document.getElementById(id);
     this._e.width = 550 * this._sizeFactor;
-    this._e.height = 420 * this._sizeFactor;
+    this._e.height = Math.max(420 * this._sizeFactor, shipSpecHeight);
+  }
+
+  get ships() {
+    return Object.values(this._ships);
   }
 
   get shipsSorted() {
-    return Object.values(this._ships).sort((a, b) => {
-      if (a.order == b.order) {
-        return 0
-      } 
-      
-      if (a.order > b.order) {
-        return 1;
-      }
-      
-      return -1
-    })
+    return this._shipsSpec.map(x => this._ships[x.id]);
   }
 
   _testBound(i, size, extra) {
