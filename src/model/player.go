@@ -103,7 +103,7 @@ func (p *Player) Check(location Point, opponent *Player) (bool, error) {
 func (p *Player) Reset() {
 	p.LastAction = nil
 	p.Turns = map[string]bool{}
-	p.Grid = NewGrid()
+	p.Grid.Reset()
 	p.Ships = make(map[string]Ship)
 	p.ShipsRemaining = 0
 
@@ -113,10 +113,10 @@ func (p *Player) Reset() {
 	}
 }
 
-func NewPlayer() Player {
+func NewPlayer(gridSize int) Player {
 	p := Player{
 		ID:    uuid.New().String(),
-		Grid:  NewGrid(),
+		Grid:  NewGrid(gridSize),
 		Turns: map[string]bool{},
 	}
 

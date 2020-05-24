@@ -42,9 +42,7 @@ class API {
             id: null,
             action: null,
         };
-
-        this.gridPlan = new GridPlan('grid-player', {});
-        this.gridPlay = new GridPlay('grid-opponent', {});
+        this._size = params.get('size') || 10;
     }
 
     get _player() {
@@ -53,6 +51,11 @@ class API {
 
     get _opponent() {
         return this._state.player1.id === '-' ? this._state.player1 : this._state.player2;
+    }
+
+    _initGrids() {
+        this.gridPlan = new GridPlayer('grid-player', {}, this._state.gridSize);
+        this.gridPlay = new GridOpponent('grid-opponent', {}, this._state.gridSize);
     }
 
     _startPlanUI() {
@@ -145,7 +148,7 @@ class API {
         const pid = params.get('pid');
 
         if (!gid && !pid) {
-            return axios.get('/api/game')
+            return axios.get(`/api/game?size=${this._size}`)
                 .then((res) => {
                     this._state = res.data;
                 })
@@ -188,6 +191,8 @@ class API {
                     this._state = response.data;
                     this._gid = gid;
                     this._pid = pid;
+
+                    this._initGrids();
 
                     if (this._state.state === GameStateInitial) {
                         $waitingOpponent.show();

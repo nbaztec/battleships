@@ -2,7 +2,7 @@ class GridBase {
   constructor(id, ships, size, blockSize) {
     this._ships = ships;
     this._turns = {};
-    this._size = size || 10;
+    this._size = size;
     this._N = blockSize || 40;
     this._g = document.getElementById(id)
     this._d = Array(this._size).fill().map(x => Array(this._size).fill(''));
@@ -13,6 +13,11 @@ class GridBase {
       hitOverlay: '#DC143C',
       partialHitOverlay: '#CD5C5C',
     };
+
+    this._sizeFactor = size / 10;
+    this._e = document.getElementById(id);
+    this._e.width = 550 * this._sizeFactor;
+    this._e.height = 420 * this._sizeFactor;
   }
 
   get shipsSorted() {

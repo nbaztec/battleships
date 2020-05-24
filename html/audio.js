@@ -1,7 +1,7 @@
 Audio.prototype.stopAndPlay = function() {
     this.pause()
     this.currentTime = 0;
-    return this.play().then(() => console.log(this.src, 'end'));
+    return this.play();
 };
 
 const audioStart = new Audio('./sound/start.wav');

@@ -1,4 +1,12 @@
-class GridPlan extends GridBase {
+class GridPlayer extends GridBase {
+  constructor(id, ships, size, blockSize) {
+    super(id, ships, size, blockSize);
+    if (this._sizeFactor > 1) {
+      this._e.classList.add('block');
+      this._e.classList.remove('ml-5');
+    }
+  }
+
   reset() {
     this._placeExit = true;
     this.disableMove();

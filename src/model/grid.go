@@ -11,8 +11,7 @@ var (
 )
 
 const (
-	GridCellEmpty   = ""
-	DefaultGridSize = 10
+	GridCellEmpty = ""
 )
 
 type Grid struct {
@@ -54,6 +53,10 @@ func (g *Grid) Load(ships []Ship) error {
 	return nil
 }
 
+func (g *Grid) Reset() {
+	g.Field = nil
+}
+
 func (g *Grid) Print() error {
 	for i := 0; i < g.Size; i++ {
 		for j := 0; j < g.Size; j++ {
@@ -65,13 +68,7 @@ func (g *Grid) Print() error {
 	return nil
 }
 
-func NewGrid() Grid {
-	return Grid{
-		Size: DefaultGridSize,
-	}
-}
-
-func NewGridOfSize(size int) Grid {
+func NewGrid(size int) Grid {
 	return Grid{
 		Size: size,
 	}

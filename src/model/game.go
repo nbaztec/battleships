@@ -23,6 +23,7 @@ const (
 
 type Game struct {
 	ID             string    `json:"id"`
+	GridSize       int       `json:"gridSize"`
 	State          GameState `json:"state"`
 	NextPlayerID   string    `json:"nextPlayerId"`
 	Player1        *Player   `json:"player1"`
@@ -36,6 +37,7 @@ type Game struct {
 func (g *Game) Hidden(playerID string) Game {
 	game := Game{
 		ID:             g.ID,
+		GridSize:       g.GridSize,
 		State:          g.State,
 		LastActivity:   g.LastActivity,
 		NextPlayerID:   g.NextPlayerID,
@@ -92,7 +94,7 @@ func (g *Game) AddPlayer() (*Player, error) {
 		return nil, errGameOver
 	}
 
-	p := NewPlayer()
+	p := NewPlayer(g.GridSize)
 	if g.Player1 == nil {
 		g.Player1 = &p
 		g.NextPlayerID = p.ID
@@ -223,9 +225,10 @@ func (g *Game) Reset() {
 	g.NextRevision()
 }
 
-func NewGame(id string) *Game {
+func NewGame(id string, gridSize int) *Game {
 	return &Game{
 		ID:             id,
+		GridSize:       gridSize,
 		State:          GameStateInitial,
 		LastActivity:   time.Now().UTC(),
 		Revision:       uuid.New().String(),

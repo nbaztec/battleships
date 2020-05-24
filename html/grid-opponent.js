@@ -1,4 +1,13 @@
-class GridPlay extends GridBase {
+class GridOpponent extends GridBase {
+  constructor(id, ships, size, blockSize) {
+    super(id, ships, size, blockSize);
+    if (this._sizeFactor > 1) {
+      this._e.classList.add('block', 'mb-5');
+      this._e.style.border = null;
+      this._e.style.borderBottom = '1px solid gray';
+    }
+  }
+
   set(ships, turns) {
     this._ships = ships;
     this._turns = turns;

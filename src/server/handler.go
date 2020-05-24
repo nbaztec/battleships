@@ -2,9 +2,11 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/nbaztec/battleships/src/model"
 	"github.com/pkg/errors"
@@ -18,6 +20,7 @@ var (
 
 const (
 	maxGenerateGameIDTries = 15
+	defaultGridSize        = 10
 )
 
 var gameMaster = model.NewGameMaster()
@@ -25,7 +28,15 @@ var gameMaster = model.NewGameMaster()
 func StartGameHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-type", "application/json")
 
+	gridSize := defaultGridSize
 	gameID := r.URL.Query().Get("gid")
+	size := r.URL.Query().Get("size")
+	if size != "" {
+		if sz, err := strconv.Atoi(size); err == nil {
+			gridSize = sz
+		}
+	}
+
 	if gameID == "" {
 		newGameID := ""
 		for i := 0; i < maxGenerateGameIDTries; i++ {
@@ -41,7 +52,7 @@ func StartGameHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.Redirect(w, r, "/api/game?gid="+newGameID, http.StatusSeeOther)
+		http.Redirect(w, r, fmt.Sprintf("/api/game?gid=%s&size=%d", newGameID, gridSize), http.StatusSeeOther)
 		return
 	}
 
@@ -50,7 +61,7 @@ func StartGameHandler(w http.ResponseWriter, r *http.Request) {
 	game, err := gameMaster.GetGame(gameID)
 	if playerID == "" {
 		if err != nil {
-			game = gameMaster.CreateGame(gameID)
+			game = gameMaster.CreateGame(gameID, gridSize)
 		}
 
 		p, err := game.AddPlayer()
