@@ -81,7 +81,7 @@ $(function() {
             return;
         }
 
-        api.placeShips().catch(console.error);
+        gameMaster.placeShips().catch(console.error);
     });
 
     $btnReady.click(() => {
@@ -89,7 +89,7 @@ $(function() {
             return;
         }
 
-        api.setShips()
+        gameMaster.setShips()
             .then(() => {
                 $btnReady.disable();
                 $btnReset.disable();
@@ -103,7 +103,7 @@ $(function() {
             return;
         }
 
-        api.resign()
+        gameMaster.resign()
             .then(() => {
                 $btnResign.disable();
                 $btnRematch.enable();
@@ -116,7 +116,12 @@ $(function() {
             return;
         }
 
-        api.rematch()
+        $resultWin.hide();
+        $resultLoss.hide();
+        $turnPlayer.hide();
+        $turnOpponent.hide();
+
+        gameMaster.rematch()
             .then(() => {
                 $btnRematch.disable();
                 $btnResign.disable();

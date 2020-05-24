@@ -98,12 +98,13 @@
   <script src="grid-player.js"></script>
   <script src="grid-opponent.js"></script>
   <script src="./api.js"></script>
+  <script src="./game-master.js"></script>
   <script>
-    const api = new API();
+    const gameMaster = new GameMaster();
   </script>
   <script>
     $(function() {
-      api.game().then(console.log).catch(console.error);
+      gameMaster.game().then(console.log).catch(console.error);
     });
   </script>
   </main>
