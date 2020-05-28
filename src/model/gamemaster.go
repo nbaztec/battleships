@@ -7,9 +7,11 @@ import (
 
 const (
 	DefaultGCDuration = 30 * time.Minute
+	MaxGames          = 50
 )
 
 var (
+	errMaxGamesExceeded  = errors.New("max number of games has been reached")
 	errGameNotFound      = errors.New("game not found")
 	errGameAlreadyExists = errors.New("game already exists")
 )
@@ -36,6 +38,10 @@ func (g *GameMaster) CreateGame(id string, gridSize, shipCount int) (*Game, erro
 
 	if _, ok := g.ActiveGames[id]; ok {
 		return nil, errGameAlreadyExists
+	}
+
+	if len(g.ActiveGames) > MaxGames {
+		return nil, errMaxGamesExceeded
 	}
 
 	game := NewGame(id, gridSize, shipCount)
