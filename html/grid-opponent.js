@@ -116,6 +116,17 @@ class GridOpponent extends GridBase {
           ctx.strokeStyle = this._color.hitStroke;
           ctx.strokeRect(1 + (ship.position.col*this._N), 1 + (ship.position.row*this._N), this._N*ship.size, this._N);
         }
+      } else if(ship.position !== null) { // draw ship on game over
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = this._color.evadeStroke;
+        ctx.fillStyle = ship.color;
+        if (ship.position.vertical) {
+          ctx.fillRect(1 + (ship.position.col*this._N), 1 + ship.position.row*this._N, this._N, this._N*ship.size);
+          ctx.strokeRect(1 + (ship.position.col*this._N), 1 + ship.position.row*this._N, this._N, this._N*ship.size);
+        } else {
+          ctx.fillRect(1 + (ship.position.col*this._N), 1 + (ship.position.row*this._N), this._N*ship.size, this._N);      
+          ctx.strokeRect(1 + (ship.position.col*this._N), 1 + (ship.position.row*this._N), this._N*ship.size, this._N);
+        }
       }
     });
   }

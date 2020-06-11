@@ -11,6 +11,7 @@ class GridBase {
       hit: '#FA8072',
       miss: '#DCDCDC',
       hitStroke: '#DC143C',
+      evadeStroke: '#000',
       hitOverlay: '#DC143C',
       partialHitOverlay: '#CD5C5C',
     };

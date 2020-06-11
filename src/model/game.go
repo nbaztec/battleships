@@ -72,7 +72,7 @@ func (g *Game) Hidden(playerID string) Game {
 	hiddenPlayer.ID = "-"
 	for k := range hiddenPlayer.Ships {
 		s := hiddenPlayer.Ships[k]
-		if !s.HasSunk() {
+		if !g.Over() && !s.HasSunk() {
 			s.Position = nil
 		}
 
