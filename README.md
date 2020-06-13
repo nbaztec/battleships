@@ -1,6 +1,8 @@
 # Battleships
 Go implementation for the classic [battleship](https://en.wikipedia.org/wiki/Battleship_(game))  game. 
 
+Demo site: battleships-dot-nbaztec.ey.r.appspot[dot]com
+
 The frontend uses [jQuery](https://jquery.com/) and [Bootstrap](https://getbootstrap.com/).
 
 ## Run 
