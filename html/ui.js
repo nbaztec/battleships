@@ -115,7 +115,6 @@ $(function() {
         gameMaster.setShips()
             .then(() => {
                 $btnReady.disable();
-                $btnReset.disable();
                 $btnOrient.disable();
             })
             .catch(console.error);
